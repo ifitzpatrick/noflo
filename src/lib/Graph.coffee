@@ -719,6 +719,7 @@ class Graph extends EventEmitter
 
   toJSON: ->
     json =
+      caseSensitive: @caseSensitive
       properties: {}
       inports: {}
       outports: {}
@@ -788,11 +789,12 @@ exports.Graph = Graph
 exports.createGraph = (name) ->
   new Graph name
 
-exports.loadJSON = (definition, callback, metadata = {}, caseSensitive = false) ->
+exports.loadJSON = (definition, callback, metadata = {}) ->
   definition = JSON.parse definition if typeof definition is 'string'
   definition.properties = {} unless definition.properties
   definition.processes = {} unless definition.processes
   definition.connections = [] unless definition.connections
+  caseSensitive = definition.caseSensitive or false
 
   graph = new Graph definition.properties.name, caseSensitive
 
@@ -858,7 +860,7 @@ exports.loadFBP = (fbpData, callback, metadata = {}, caseSensitive = false) ->
     definition = require('fbp').parse fbpData, caseSensitive: caseSensitive
   catch e
     return callback e
-  exports.loadJSON definition, callback, metadata, caseSensitive
+  exports.loadJSON definition, callback, metadata
 
 exports.loadHTTP = (url, callback) ->
   req = new XMLHttpRequest
@@ -880,11 +882,11 @@ exports.loadFile = (file, callback, metadata = {}, caseSensitive = false) ->
       exports.loadHTTP file, (err, data) ->
         return callback err if err
         if file.split('.').pop() is 'fbp'
-          return exports.loadFBP data, callback, metadata, caseSensitive
+          return exports.loadFBP data, callback, metadata
         definition = JSON.parse data
-        exports.loadJSON definition, callback, metadata, caseSensitive
+        exports.loadJSON definition, callback, metadata
       return
-    exports.loadJSON definition, callback, metadata, caseSensitive
+    exports.loadJSON definition, callback, metadata
     return
   # Node.js graph file
   require('fs').readFile file, "utf-8", (err, data) ->
@@ -894,7 +896,7 @@ exports.loadFile = (file, callback, metadata = {}, caseSensitive = false) ->
       return exports.loadFBP data, callback, {}, caseSensitive
 
     definition = JSON.parse data
-    exports.loadJSON definition, callback, {}, caseSensitive
+    exports.loadJSON definition, callback, {}
 
 # remove everything in the graph
 resetGraph = (graph) ->

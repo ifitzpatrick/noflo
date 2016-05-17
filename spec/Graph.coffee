@@ -96,6 +96,7 @@ describe 'Graph', ->
   describe 'loaded from JSON (with case sensitive port names)', ->
     jsonString = """
 {
+  "caseSensitive": true,
   "properties": {
     "name": "Example",
     "foo": "Baz",
@@ -233,12 +234,11 @@ describe 'Graph', ->
     json = JSON.parse(jsonString)
     g = null
     it 'should produce a Graph', (done) ->
-      graph.loadJSON json, ((err, instance) ->
+      graph.loadJSON json, (err, instance) ->
         return done err if err
         g = instance
         chai.expect(g).to.be.an 'object'
         done()
-      ), {}, true
     it 'should have a name', ->
       chai.expect(g.name).to.equal 'Example'
     it 'should have graph metadata intact', ->
@@ -550,6 +550,7 @@ describe 'Graph', ->
   describe 'Legacy exports loaded via JSON', ->
     jsonString = """
 {
+  "caseSensitive": true,
   "exports": [
     {
       "public": "in",
@@ -582,7 +583,6 @@ describe 'Graph', ->
         g = instance
         chai.expect(g).to.be.an 'object'
         done()
-      , {}, true
 
     it 'should have two legacy exports', (done) ->
       chai.expect(g.exports).to.be.an 'array'
